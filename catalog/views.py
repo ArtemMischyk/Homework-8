@@ -2,9 +2,35 @@ import datetime
 from typing import Any
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
 from django.views import generic
-from .forms import BookInstanceEditForm
+from .forms import ReserveBookForm
 from .models import Book, Author, BookInstance
+
+
+
+
+class AuthorCreateView(generic.CreateView):
+    model = Author
+    fields = "__all__"
+    initial = {
+        "date_of_death": "11/03/2009",
+    }
+    "http://localhost:63342/homework7.py/catalog/templates/create"
+
+
+class AuthorUpdateView(generic.UpdateView):
+    model = Author
+    fields = ['name']
+    "http://localhost:63342/homework7.py/catalog/templates/create"
+
+
+
+class AuthorDeleteView(generic.DeleteView):
+    model = Author
+    success_url = reverse_lazy('author-list')
+    "http://localhost:63342/homework7.py/catalog/templates/create"
+
 
 
 class BookListView(generic.ListView):
@@ -53,7 +79,7 @@ def reserve_book_form(request, pk):
     book_instance = get_object_or_404(BookInstance, pk=pk)
 
     if request.session == "POST":
-        form = BookInstanceEditForm(request.POST)
+        form = ReserveBookForm(request.POST)
 
         if form.is_valid():
             #  Perform action
@@ -66,13 +92,10 @@ def reserve_book_form(request, pk):
 
     else:
         proposed_return_date = datetime.date.today() + datetime.timedelta(weeks=3)
-        form = BookInstanceEditForm(initial={"return_date": proposed_return_date})
+        form = ReserveBookForm(initial={"return_date": proposed_return_date})
 
     return render(
         request,
         "book/reserve.html",
         {"form": form, "book_instance": book_instance},
     )
-
-
-
